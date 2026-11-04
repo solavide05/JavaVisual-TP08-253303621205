@@ -2,14 +2,13 @@
 package com.unpri.charactermanager.view;
 
 import com.unpri.charactermanager.model.Character;
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.Dimension;
 import java.util.ArrayList;
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 public class MainWindow extends JFrame {
 
@@ -20,7 +19,7 @@ public class MainWindow extends JFrame {
     public MainWindow(ArrayList<Character> characterList,
                       double averageLevel) {
 
-        super("Character Manager v0.3");
+        super("Character Manager v0.4");
 
         if (characterList == null) {
             throw new IllegalArgumentException(
@@ -35,8 +34,9 @@ public class MainWindow extends JFrame {
 
         initComponents();
 
-        setSize(550, 450);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        pack();
+        setMinimumSize(new Dimension(550, 400));
         setLocationRelativeTo(null);
     }
 
@@ -46,25 +46,42 @@ public class MainWindow extends JFrame {
             new BoxLayout(mainPanel, BoxLayout.Y_AXIS)
         );
 
-        mainPanel.setBorder(
-            BorderFactory.createEmptyBorder(20, 20, 20, 20)
-        );
+        mainPanel.setBorder(AppTheme.CARD_BORDER);
+        mainPanel.setBackground(AppTheme.BG_MAIN);
+        mainPanel.setOpaque(true);
 
-        mainPanel.setBackground(Color.WHITE);
-
-        // Judul aplikasi
+        // JUDUL
         JLabel titleLabel = new JLabel(
-            "=== Daftar Karakter (" + characterList.size() + ") ==="
+            "DAFTAR KARAKTER (" + characterList.size() + ")"
         );
 
-        titleLabel.setFont(
-            new Font("Arial", Font.BOLD, 18)
-        );
+        titleLabel.setFont(AppTheme.FONT_TITLE);
+        titleLabel.setForeground(AppTheme.TEXT_WHITE);
+        titleLabel.setAlignmentX(LEFT_ALIGNMENT);
 
         mainPanel.add(titleLabel);
 
-        // Menampilkan karakter menggunakan perulangan
+        // MENAMPILKAN KARTU KARAKTER
         for (Character c : characterList) {
+
+            JPanel card = new JPanel();
+
+            card.setLayout(
+                new BoxLayout(card, BoxLayout.Y_AXIS)
+            );
+
+            card.setBackground(
+                AppTheme.colorFor(c.getType())
+            );
+
+            card.setBorder(AppTheme.CARD_BORDER);
+            card.setOpaque(true);
+
+            // Properti tambahan 1: tooltip
+            card.setToolTipText(
+                "Karakter " + c.getName()
+                + " dengan role " + c.getType()
+            );
 
             String info = c.getName()
                     + " | " + c.getType()
@@ -74,14 +91,32 @@ public class MainWindow extends JFrame {
 
             JLabel characterLabel = new JLabel(info);
 
-            characterLabel.setFont(
-                new Font("Arial", Font.PLAIN, 13)
+            // Properti tambahan 2: perataan tulisan
+            characterLabel.setHorizontalAlignment(
+                SwingConstants.LEFT
             );
 
-            mainPanel.add(characterLabel);
+            // Level minimal 5 menggunakan warna emas
+            if (c.getLevel() >= AppTheme.HIGH_LEVEL_THRESHOLD) {
+
+                characterLabel.setForeground(AppTheme.GOLD);
+
+                characterLabel.setFont(
+                    AppTheme.FONT_TITLE.deriveFont(14f)
+                );
+
+            } else {
+
+                characterLabel.setForeground(AppTheme.TEXT_WHITE);
+                characterLabel.setFont(AppTheme.FONT_BODY);
+            }
+
+            card.add(characterLabel);
+
+            mainPanel.add(card);
         }
 
-        // Statistik rata-rata level
+        // RATA-RATA LEVEL
         JLabel averageLabel = new JLabel(
             String.format(
                 "Rata-rata Level: %.2f",
@@ -89,17 +124,12 @@ public class MainWindow extends JFrame {
             )
         );
 
-        averageLabel.setFont(
-            new Font("Arial", Font.BOLD, 15)
-        );
-
-        averageLabel.setForeground(
-            new Color(0, 100, 0)
-        );
+        averageLabel.setFont(AppTheme.FONT_TITLE.deriveFont(16f));
+        averageLabel.setForeground(AppTheme.GOLD);
+        averageLabel.setAlignmentX(LEFT_ALIGNMENT);
 
         mainPanel.add(averageLabel);
 
-        // Memasukkan panel ke jendela
         add(mainPanel);
     }
 }
